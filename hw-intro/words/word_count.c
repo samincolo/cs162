@@ -30,22 +30,50 @@ char *new_string(char *str) {
 
 void init_words(WordCount **wclist) {
   /* Initialize word count.  */
-  *wclist = NULL;
+  *wclist = (WordCount*) malloc(sizeof(WordCount));
+  (*wclist)->word = "";
+  (*wclist)->next = NULL;
 }
 
 size_t len_words(WordCount *wchead) {
-    size_t len = 0;
+    size_t len = 1;
+    while(wchead->next) {
+      ++len;
+      wchead = wchead->next;
+    }
     return len;
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = NULL;
+  while(wchead->next) {
+    if(strcmp(wchead->word,word)==0) {
+      wc = wchead;
+    }
+    wchead = wchead->next;
+  }
   return wc;
 }
 
 void add_word(WordCount **wclist, char *word) {
   /* If word is present in word_counts list, increment the count, otw insert with count 1. */
+  WordCount *wc = *wclist;
+  WordCount *prev = *wclist;
+  while(wc) {
+    if(strcmp(wc->word,word)==0) {
+      wc->count += 1;
+      return;
+    }
+    prev = wc;
+    wc = wc->next;
+  }
+  prev->next = (WordCount*) malloc(sizeof(WordCount));
+  prev = prev->next;
+  prev->word = strdup(word);
+  prev->count = 1;
+  prev->next = NULL;
+  return;
 }
 
 void fprint_words(WordCount *wchead, FILE *ofile) {
